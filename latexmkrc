@@ -1,4 +1,7 @@
-$ENV{'TEXINPUTS'}='./sty//:' . $ENV{'TEXINPUTS'}; 
+$ENV{'TEXINPUTS'}='./sty//:./figures//:' . $ENV{'TEXINPUTS'};
+
+$pdf_mode = 1;
+$pdflatex = 'pdflatex -shell-escape -interaction=nonstopmode -synctex=1 %O %S';
 
 # support for the glossaries package:
 add_cus_dep('glo', 'gls', 0, 'makeglossaries');

@@ -1,0 +1,46 @@
+name: Build slides
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX slides
+        uses: dante-ev/latex-action@v2
+        with:
+          root_file: demo.tex
+          args: -pdf -shell-escape -interaction=nonstopmode -file-line-error
+          extra_system_packages: "py3-pygments"
+
+      - name: Rename output
+        run: mv demo.pdf veritracer-presentation.pdf
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: veritracer-presentation
+          path: veritracer-presentation.pdf
+
+      - name: Publish latest release asset
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: Latest slides
+          body: Auto-published slides from the latest commit on main.
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: veritracer-presentation.pdf
+          token: ${{ secrets.GITHUB_TOKEN }}
